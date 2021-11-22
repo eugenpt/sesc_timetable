@@ -1,0 +1,87 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="schedule.js"></script>
+  <script src="universal.js"></script>
+  <link rel="stylesheet" href="style.css" />
+<script>
+
+function joinedRow(row){
+  R = [{col_span:1, data:row[0]}];
+  j=1;
+  while(j<row.length){
+    if(row[j]==R.last().data){
+      R[R.length-1].col_span = R[R.length-1].col_span + 1;
+    }else{
+      R.push({col_span:1, data:row[j]})
+    }
+    j=j+1
+  }
+  return R;
+}
+
+function joinedRowHTML(row, elt='td'){
+  R = joinedRow(row);
+  tr = _ce('tr');
+  R.map(E => _ce(elt, 'innerHTML',E.data,'colSpan',E.col_span)).forEach(e=>tr.appendChild(e));
+  return tr;e
+}
+
+function onBodyLoad(){
+  T = _('#table');
+
+  HR1 = ['day','les'];
+  HR2 = ['day','les'];
+  _C.Classes.forEach(c=>{
+    _C.Classes_groups[c].forEach(g=>{
+      HR1.push(c);
+      HR2.push(g);
+    });
+  }); 
+  table.appendChild(joinedRowHTML(HR1));
+  table.appendChild(joinedRowHTML(HR2));
+
+  for(var dayj=1; dayj<2; dayj++){
+    for(var lj=1; lj<20; lj++){
+      row = [_C["Days"][dayj].name, _C.Times[lj]];
+      have=false;
+      
+      _C.Classes.forEach(c=>{
+        _C.Classes_groups[c].forEach(g=>{
+          d = _S.filter(x=>((x.day==dayj)&&(x.l==lj)&&(x.c==c)&&(x.g==g)));
+          console.log(d.length)
+          if(d.length>0){
+            d=d[0];
+            row.push(d.subj+'<br/>'+d.room+'<br/>'+d.teacher);
+            have = true;
+          }else{
+            row.push('--');
+          }
+          
+        });
+      });
+      if(have){
+        table.appendChild(joinedRowHTML(row));
+      }
+    }
+  }
+
+
+  _('#table tr').slice(0,2).forEach((e)=>e.classList.add('pos-sticky'));
+  _('#table tr')[0].style.top="0px";
+
+  _('#table tr').slice(2).forEach((row)=>row.getElementsByTagName('td').forEach((e)=>e.classList.add('pos-sticky')));
+  _('#table tr').forEach((row)=>row.getElementsByTagName('td')[0].style.left="0px");
+}
+
+</script>  
+</head>
+<body onload="onBodyLoad();">
+  <div id="main">
+    <table id="table">
+
+    </table>
+  </div>
+</body>
+</html>
