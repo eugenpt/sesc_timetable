@@ -1,5 +1,7 @@
-table{
+table, td, th{
   overflow-x:auto;
+  border-collapse: collapse;
+  border: 1px solid black;
 }
 
 td{
@@ -10,6 +12,10 @@ td.weekday{
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   left: 0px;
+}
+
+td.weekday-last{
+  writing-mode: vertical-rl;
 }
 
 .pos-sticky{

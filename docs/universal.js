@@ -98,12 +98,18 @@ function listMap(arr, fun) {
   return [].map.call(arr, fun);
 }
 
+
+Array.prototype.last = function(){
+  return this[this.length-1];
+};
+
 // add map and forEach to some DOM-related array-like thingies
-['map','forEach','filter'].forEach( (fun_name) => {
+['map','forEach','filter','last'].forEach( (fun_name) => {
   [NodeList, HTMLCollection].forEach( (obj) => {
     obj.prototype[fun_name] = function(fun) { return [][fun_name].call(this, fun); };
   })
-})
+});
+
 
 // if property is dot-separated (style.color for example)
 //  take obj.style.color instead of just obj['style.color']
@@ -257,10 +263,6 @@ function _(s){
 }
 
 
-Array.prototype.last = function(){
-  return this[this.length-1];
-}
-
 Array.prototype.max = function(){
   return Math.max.apply(Math, this);
 }
@@ -268,6 +270,15 @@ Array.prototype.min = function(){
   return Math.min.apply(Math, this);
 }
 
+function sum(arr){
+  var r = 0;
+  arr.forEach((e) => { r+=e; });
+  return r;
+}
+
+Array.prototype.sum = function(){
+  return sum(this);
+}
 
 
 // create element

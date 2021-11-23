@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="style.css" />
 <script>
 
+NGroups =  sum(_C.Classes.map(c=>sum(_C.Classes_groups[c].map(g=>g.length))));
+
+
 function joinedRow(row){
   R = [{col_span:1, data:row[0], col:0}];
   j=1;
@@ -61,20 +64,33 @@ function mergeRows(table){
       jtd = getTableCell(table, row_j,col)
       rowspan = 1;
       if(jtd!==null){
+        jtd.dataset['rowspan'] = rowspan;
         for(var row_i=row_j+1 ; row_i < trs.length ; row_i++){
           itd = getTableCell(table, row_i, col)
           if((itd!==null)
             &&(itd.innerHTML==jtd.innerHTML)
-            &&(itd.dataset['col']==jtd.dataset['col'])){
+            &&(itd.dataset['col']==jtd.dataset['col'])
+            &&(itd.colSpan==jtd.colSpan)){
             rowspan++;
-            jtd.rowSpan = rowspan;
-            itd.parentElement.removeChild(itd);
-          }  
+            jtd.dataset['rowspan']=rowspan;
+            itd.dataset['del'] = 1;
+            // jtd.rowSpan = rowspan;
+            // itd.parentElement.removeChild(itd);
+          } else {
+            break;
+          } 
         }
       }
       row_j += rowspan;
     }
   }
+
+  table.getElementsByTagName('td').filter(e=>e.dataset['del']==1).forEach(e => e.parentElement.removeChild(e))
+  table.getElementsByTagName('td').forEach(e=>{
+    e.rowSpan = e.dataset['rowspan']
+  });
+
+
   return null;
 
   for(var rowj = 0 ; rowj < trs.length ; rowj++){
@@ -106,6 +122,8 @@ function mergeRows(table){
 function onBodyLoad(){
   table = _('#table');
 
+
+
   // table = _ce('table');
 
   HR1 = ['',''];
@@ -119,9 +137,13 @@ function onBodyLoad(){
   table.appendChild(joinedRowHTML(HR1));
   table.appendChild(joinedRowHTML(HR2));
 
-  for(var dayj=1; dayj<2; dayj++){
+  for(var dayj=1; dayj<7; dayj++){
+    day_name = _C["Days"][dayj].name;
+    if (dayj>1) {
+      table.appendChild(joinedRowHTML(['',' '].concat(Array(NGroups).fill(day_name)).concat([' '])));
+    }
     for(var lj=1; lj<20; lj++){
-      row = [_C["Days"][dayj].name, _C.Times[lj]];
+      row = [day_name, _C.Times[lj]];
       have=false;
       
       _C.Classes.forEach(c=>{
@@ -138,6 +160,8 @@ function onBodyLoad(){
           
         });
       });
+
+      row.push(day_name);
       if(have){
         table.appendChild(joinedRowHTML(row));
       }
@@ -152,6 +176,7 @@ function onBodyLoad(){
 
   _('#table tr').slice(2).forEach((row)=>row.getElementsByTagName('td').forEach((e)=>e.classList.add('pos-sticky')));
   _('#table tr').forEach((row)=>row.getElementsByTagName('td')[0].classList.add('weekday'));
+  _('#table tr').forEach((row)=>row.getElementsByTagName('td').last().classList.add('weekday-last'));
 
   mergeRows(table);
 }
