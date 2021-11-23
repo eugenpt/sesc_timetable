@@ -261,15 +261,24 @@ Array.prototype.last = function(){
   return this[this.length-1];
 }
 
+Array.prototype.max = function(){
+  return Math.max.apply(Math, this);
+}
+Array.prototype.min = function(){
+  return Math.min.apply(Math, this);
+}
+
 
 
 // create element
 function _ce (tag, plopName='className', plopVal='class') {
   const elt = document.createElement(tag);
   for (let j = 1; j < arguments.length; j += 2) {
-    if (arguments[j] in elt){
+    if (arguments[j] in elt) {
       elt[arguments[j]] = arguments[j + 1];
-    }else{
+    } else if (arguments[j].slice(0, 5) === 'data-') {
+      elt.dataset[arguments[j].slice(5)] = arguments[j + 1];
+    } else {
       setDotProp(elt, arguments[j], arguments[j + 1]);
     }
   }

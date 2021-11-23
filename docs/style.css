@@ -6,6 +6,12 @@ td{
   text-align: center;
 }
 
+td.weekday{
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  left: 0px;
+}
+
 .pos-sticky{
   position: sticky;
 }

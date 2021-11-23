@@ -8,13 +8,13 @@
 <script>
 
 function joinedRow(row){
-  R = [{col_span:1, data:row[0]}];
+  R = [{col_span:1, data:row[0], col:0}];
   j=1;
   while(j<row.length){
     if(row[j]==R.last().data){
       R[R.length-1].col_span = R[R.length-1].col_span + 1;
     }else{
-      R.push({col_span:1, data:row[j]})
+      R.push({col_span:1, data:row[j], col:j})
     }
     j=j+1
   }
@@ -24,15 +24,92 @@ function joinedRow(row){
 function joinedRowHTML(row, elt='td'){
   R = joinedRow(row);
   tr = _ce('tr');
-  R.map(E => _ce(elt, 'innerHTML',E.data,'colSpan',E.col_span)).forEach(e=>tr.appendChild(e));
-  return tr;e
+  R.map(E => _ce(elt, 'innerHTML',E.data,'colSpan',E.col_span,'data-col',E.col)).forEach(e=>tr.appendChild(e));
+  return tr;
+}
+
+function getTableCell(table, row, col){
+  var tr = table.getElementsByTagName('tr')[row];
+  var tds = tr.getElementsByTagName('td').filter(e=>e.dataset['col']==col);
+  return (tds.length==1)?tds[0]:null;
+  var tds = tr.getElementsByTagName('td');
+  var _col=0;
+  for(var j=0; j<tds.length ; j++){
+    if(_col == col){
+      return tds[j];
+    }else if(_col < col){
+      _col += tds[j].colSpan;
+    }else{
+      break
+    }
+  }
+  return null;
+}
+
+function getRowTdCols(row){
+  var tds = row.getElementsByTagName('td');
+  
+}
+
+function mergeRows(table){
+  max_col = table.getElementsByTagName('td').map(e=>e.dataset['col']).max()
+  var trs = table.getElementsByTagName('tr');
+
+  for(var col=max_col ; col>=0 ; col--){
+    row_j = 0;
+    while(row_j<trs.length-1) {
+      jtd = getTableCell(table, row_j,col)
+      rowspan = 1;
+      if(jtd!==null){
+        for(var row_i=row_j+1 ; row_i < trs.length ; row_i++){
+          itd = getTableCell(table, row_i, col)
+          if((itd!==null)
+            &&(itd.innerHTML==jtd.innerHTML)
+            &&(itd.dataset['col']==jtd.dataset['col'])){
+            rowspan++;
+            jtd.rowSpan = rowspan;
+            itd.parentElement.removeChild(itd);
+          }  
+        }
+      }
+      row_j += rowspan;
+    }
+  }
+  return null;
+
+  for(var rowj = 0 ; rowj < trs.length ; rowj++){
+    var tds = trs[rowj].getElementsByTagName('td');
+    console.log(tds);
+    console.log(tds.length);
+    for(var tdj=tds.length-1 ; tdj>=0 ; tdj--){
+      console.log('tdj='+tdj);
+      var jtd = tds[tdj];
+      var col_num = jtd.dataset['col'];
+      var rowspan=1;
+      console.log('col_num='+col_num)
+      for(var rowi=rowj+1 ; rowi<trs.length ; rowi++){
+        var itd = getTableCell(table, rowi, col_num);
+        if ((itd !== null)&&(itd.dataset['col']==jtd.dataset['col'])&&(itd.innerText == jtd.innerText )){
+          rowspan++;
+          jtd.rowSpan = rowspan;
+          itd.parentElement.removeChild(itd);
+          console.log('!!aa');
+        }else{
+          console.log('aa');
+          break;
+        }
+      }
+    }
+  }
 }
 
 function onBodyLoad(){
-  T = _('#table');
+  table = _('#table');
 
-  HR1 = ['day','les'];
-  HR2 = ['day','les'];
+  // table = _ce('table');
+
+  HR1 = ['',''];
+  HR2 = ['',''];
   _C.Classes.forEach(c=>{
     _C.Classes_groups[c].forEach(g=>{
       HR1.push(c);
@@ -53,7 +130,7 @@ function onBodyLoad(){
           console.log(d.length)
           if(d.length>0){
             d=d[0];
-            row.push(d.subj+'<br/>'+d.room+'<br/>'+d.teacher);
+            row.push(d.subj+'<br/>'+d.room+'<br/>'+d.teacher.replaceAll(' ','&nbsp'));
             have = true;
           }else{
             row.push('--');
@@ -67,12 +144,16 @@ function onBodyLoad(){
     }
   }
 
+ 
+ // _('#table').innerHTML = table.innerHTML;
 
   _('#table tr').slice(0,2).forEach((e)=>e.classList.add('pos-sticky'));
   _('#table tr')[0].style.top="0px";
 
   _('#table tr').slice(2).forEach((row)=>row.getElementsByTagName('td').forEach((e)=>e.classList.add('pos-sticky')));
-  _('#table tr').forEach((row)=>row.getElementsByTagName('td')[0].style.left="0px");
+  _('#table tr').forEach((row)=>row.getElementsByTagName('td')[0].classList.add('weekday'));
+
+  mergeRows(table);
 }
 
 </script>  
