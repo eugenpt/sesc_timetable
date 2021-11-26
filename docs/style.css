@@ -20,4 +20,6 @@ td.weekday-last{
 
 .pos-sticky{
   position: sticky;
+  background: white;
+  z-index: 100;
 }

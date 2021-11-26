@@ -104,9 +104,10 @@ Array.prototype.last = function(){
 };
 
 // add map and forEach to some DOM-related array-like thingies
-['map','forEach','filter','last'].forEach( (fun_name) => {
-  [NodeList, HTMLCollection].forEach( (obj) => {
-    obj.prototype[fun_name] = function(fun) { return [][fun_name].call(this, fun); };
+['map', 'forEach', 'filter', 'last', 'slice'].forEach( (fun_name) => {
+  [NodeList, HTMLCollection].forEach((obj) => {
+    obj.prototype[fun_name] = function () { return [...this][fun_name](...arguments); };
+    // obj.prototype[fun_name] = function(fun) { return [][fun_name].call(this, fun); };
   })
 });
 

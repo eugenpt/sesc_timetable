@@ -173,8 +173,10 @@ function onBodyLoad(){
 
   _('#table tr').slice(0,2).forEach((e)=>e.classList.add('pos-sticky'));
   _('#table tr')[0].style.top="0px";
+  _('#table tr')[1].style.top="25px";
 
-  _('#table tr').slice(2).forEach((row)=>row.getElementsByTagName('td').forEach((e)=>e.classList.add('pos-sticky')));
+  _('#table tr').slice(2).forEach((row)=>row.getElementsByTagName('td').slice(0,2).forEach((e)=>e.classList.add('pos-sticky')));
+  _('#table tr').slice(2).forEach((row)=>{ row.getElementsByTagName('td')[1].style.left = "20px"; });
   _('#table tr').forEach((row)=>row.getElementsByTagName('td')[0].classList.add('weekday'));
   _('#table tr').forEach((row)=>row.getElementsByTagName('td').last().classList.add('weekday-last'));
 
